@@ -1,28 +1,37 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  hadoop-client:
-    image: yourorg/hadoop-client:3.3.6  # You can use apache/hadoop:3.3.6 or packet23/hadoop-client:3.4.0
-    container_name: hadoop-client
-    hostname: hadoop-client
+  namenode:
+    image: bde2020/hadoop-namenode:3.3.5
+    container_name: hadoop-namenode
+    restart: unless-stopped
+    ports:
+      - 9870:9870     # Web UI
+      - 9000:9000     # HDFS RPC
     environment:
-      - HADOOP_HOME=/opt/hadoop
-      - HADOOP_CONF_DIR=/opt/hadoop/conf
-      - HADOOP_COMMON_HOME=/opt/hadoop
-      - HADOOP_HDFS_HOME=/opt/hadoop
-      - HADOOP_MAPRED_HOME=/opt/hadoop
-      - HADOOP_YARN_HOME=/opt/hadoop
-      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - CLUSTER_NAME=hadoop-cluster
     volumes:
-      # Mount shared Hadoop configuration
-      - ./conf:/opt/hadoop/conf
-      # Optional: mount shared logs or jars
-      - ./logs:/opt/hadoop/logs
+      - ./namenode:/hadoop/dfs/name
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
     networks:
-      - hadoop-net
-    command: ["/bin/bash", "-c", "tail -f /dev/null"]  # Keep container running idle
-    restart: always
+      - hadoop
+
+  datanode:
+    image: bde2020/hadoop-datanode:3.3.5
+    container_name: hadoop-datanode
+    restart: unless-stopped
+    ports:
+      - 9864:9864
+    environment:
+      - SERVICE_PRECONDITION=hadoop-namenode:9870
+    volumes:
+      - ./datanode:/hadoop/dfs/data
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    networks:
+      - hadoop
 
 networks:
-  hadoop-net:
+  hadoop:
     driver: bridge
