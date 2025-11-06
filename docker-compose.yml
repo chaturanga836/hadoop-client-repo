@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   namenode:
-    image: bde2020/hadoop-namenode:3.3.5
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.1.3-java8
     container_name: hadoop-namenode
     restart: unless-stopped
     ports:
@@ -12,13 +12,13 @@ services:
       - CLUSTER_NAME=hadoop-cluster
     volumes:
       - ./namenode:/hadoop/dfs/name
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
     networks:
       - hadoop
 
   datanode:
-    image: bde2020/hadoop-datanode:3.3.5
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.1.3-java8
     container_name: hadoop-datanode
     restart: unless-stopped
     ports:
@@ -27,8 +27,8 @@ services:
       - SERVICE_PRECONDITION=hadoop-namenode:9870
     volumes:
       - ./datanode:/hadoop/dfs/data
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
     networks:
       - hadoop
 
