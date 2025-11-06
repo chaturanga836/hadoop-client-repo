@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     ports:
       - 9870:9870     # Web UI
-      - 9000:9000     # HDFS RPC
+      - 9002:9000     # HDFS RPC
     environment:
       - CLUSTER_NAME=hadoop-cluster
     volumes:
