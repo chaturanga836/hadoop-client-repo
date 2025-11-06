@@ -6,10 +6,12 @@ services:
     container_name: hadoop-namenode
     restart: unless-stopped
     ports:
-      - 9870:9870     # Web UI
-      - 9002:9000     # HDFS RPC
+      - 9870:9870     # Web UI (external)
+      - 9002:9000     # HDFS RPC (external access if needed)
     environment:
       - CLUSTER_NAME=hadoop-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+      - HDFS_CONF_dfs_replication=1
     volumes:
       - ./namenode:/hadoop/dfs/name
       - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
@@ -22,9 +24,11 @@ services:
     container_name: hadoop-datanode
     restart: unless-stopped
     ports:
-      - 9864:9864
+      - 9864:9864     # DataNode UI
     environment:
-      - SERVICE_PRECONDITION=hadoop-namenode:9870
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - SERVICE_PRECONDITION=hadoop-namenode:9000
     volumes:
       - ./datanode:/hadoop/dfs/data
       - ./conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
